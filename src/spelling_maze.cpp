@@ -1,42 +1,15 @@
-#include <math.h>
-#include <iostream>
-#include <random>
-#include <ctime>
-#include <vector>
-#include <SFML/Graphics.hpp>
-#include <chrono>
 #include "../include/map.hpp"
+#include <pybind11/pybind11.h>
 
 
-int main()
-{
-    std::string words[5] = {"Hello", "Random", "Testing", "Maze", "Generation"};
-    int grid_widths[4] = {20, 40, 80, 160};
+void generate_maze(std::string word, int grid_width, int grid_height, int block_width = 20, int block_height = 20){
     generator.seed(time(0));
-    
-    std::cout << "Word,Width,Height,Generation Time,Image Save Time," << std::endl;
+    WordMaze m(word, grid_width, grid_height, block_width, block_height);
+    m.save_to_png(word + ".png");
+}
 
-    for(std::string word: words){
-        for(int grid_width: grid_widths){
-                std::cout << word << "," << grid_width << "," << grid_width << ",";
-                
-                
-                auto start = std::chrono::high_resolution_clock::now();
-                WordMaze m(word, grid_width, grid_width, 20, 20);
-                auto stop = std::chrono::high_resolution_clock::now();
-                auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
-                std::cout << duration.count()  / 1000.f << ",";
-
-
-                start = std::chrono::high_resolution_clock::now();
-                m.save_to_png("Test.png");
-                stop = std::chrono::high_resolution_clock::now();
-                duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
-                std::cout << duration.count()  / 1000.f << "," << std::endl;
-        }
-    }
-
-    return 0;
+PYBIND11_MODULE(SpellingMaze, m) {
+    m.def("generate_maze", &generate_maze, "A function to generate a maze.");
 }
 
 
